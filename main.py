@@ -7,7 +7,6 @@ Alur:
   -> perspective transform -> thresholding -> bandingkan dengan template kosong
   -> baca jawaban per soal -> cocokkan kunci (benar/salah) -> nilai
 
-Cara jalan paling singkat (lihat README.md untuk lengkapnya):
 """
 
 import argparse
