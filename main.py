@@ -9,7 +9,6 @@ Alur:
 
 Cara jalan paling singkat (lihat README.md untuk lengkapnya):
     python main.py --demo          # coba dengan data buatan, tanpa perlu foto sendiri
-    python main.py                 # periksa semua foto di dataset/lembar
 """
 
 import argparse
