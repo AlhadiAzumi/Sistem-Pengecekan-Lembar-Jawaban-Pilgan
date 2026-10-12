@@ -7,6 +7,10 @@ Alur:
   -> perspective transform -> thresholding -> bandingkan dengan template kosong
   -> baca jawaban per soal -> cocokkan kunci (benar/salah) -> nilai
 
+Cara jalan paling singkat (lihat README.md untuk lengkapnya):
+    python main.py --demo          # coba dengan data buatan, tanpa perlu foto sendiri
+    python main.py                 # periksa semua foto di dataset/lembar
+    python main.py --scan          # kalau gambarnya hasil scan / sudah dipotong rapi
 """
 
 import argparse
