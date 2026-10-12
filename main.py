@@ -8,7 +8,6 @@ Alur:
   -> baca jawaban per soal -> cocokkan kunci (benar/salah) -> nilai
 
 Cara jalan paling singkat (lihat README.md untuk lengkapnya):
-    python main.py --demo          # coba dengan data buatan, tanpa perlu foto sendiri
 """
 
 import argparse
