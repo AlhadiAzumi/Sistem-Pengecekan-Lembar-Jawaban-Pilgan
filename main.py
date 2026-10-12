@@ -1,6 +1,6 @@
 """
 SISTEM PEMERIKSAAN LEMBAR JAWABAN PILIHAN GANDA (50 soal, opsi A-E)
-Praktikum Pengolahan Citra Digital - Python, OpenCV, NumPy
+Praktikum Pengolahan Citra Digital - Python, OpenCV, NumPy, CSV
 
 Alur:
   foto lembar -> grayscale -> gaussian blur -> canny -> kontur lembar (4 titik)
