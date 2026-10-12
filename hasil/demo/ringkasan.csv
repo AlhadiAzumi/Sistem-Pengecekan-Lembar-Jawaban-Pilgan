@@ -1,0 +1,6 @@
+lembar,benar,salah,kosong,ganda,nilai,akurasi_baca
+demo_01,40,10,1,1,80.0,50/50
+demo_02,37,13,1,1,74.0,50/50
+demo_03,33,17,1,1,66.0,50/50
+demo_04,30,20,1,1,60.0,50/50
+demo_05,33,17,1,1,66.0,50/50
