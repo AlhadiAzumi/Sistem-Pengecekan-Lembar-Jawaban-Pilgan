@@ -205,6 +205,55 @@ def annotate(warped, positions, answers, key, benar, salah, nilai):
     return out
 
 
+def make_steps_figure(steps, title, cell_w=360, cell_h=480, cols=4):
+    """Gabungkan semua langkah jadi satu figure bergrid berlabel."""
+    labels = {
+        "1_original": "1. Original",
+        "2_grayscale": "2. Grayscale",
+        "3_blur": "3. Gaussian Blur",
+        "4_canny": "4. Canny",
+        "5_kontur_lembar": "5. Kontur Lembar",
+        "6_perspective_warp": "6. Perspective Warp",
+        "7_threshold": "7. Threshold",
+        "8_hasil": "8. Hasil",
+    }
+    items = [(labels.get(k, k), img) for k, img in steps.items()]
+    if not items:
+        return None
+
+    cols = max(1, min(cols, len(items)))
+    rows = (len(items) + cols - 1) // cols
+    label_h, title_h, pad = 34, 46, 10
+
+    tiles = []
+    for label, img in items:
+        if img.ndim == 2:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        h, w = img.shape[:2]
+        scale = min((cell_w - 2 * pad) / w, (cell_h - label_h - 2 * pad) / h)
+        nw, nh = max(1, int(w * scale)), max(1, int(h * scale))
+        resized = cv2.resize(img, (nw, nh), interpolation=cv2.INTER_AREA)
+        tile = np.full((cell_h, cell_w, 3), 255, np.uint8)
+        x, y = (cell_w - nw) // 2, label_h + (cell_h - label_h - nh) // 2
+        tile[y:y + nh, x:x + nw] = resized
+        cv2.putText(tile, label, (pad, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                    (0, 0, 0), 2, cv2.LINE_AA)
+        cv2.rectangle(tile, (0, 0), (cell_w - 1, cell_h - 1), (200, 200, 200), 1)
+        tiles.append(tile)
+
+    fig_w = cols * cell_w + (cols + 1) * pad
+    fig_h = title_h + rows * cell_h + (rows + 1) * pad
+    fig = np.full((fig_h, fig_w, 3), 255, np.uint8)
+    cv2.putText(fig, f"Tahapan Pengolahan Citra - {title}", (pad, 32),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+    for i, tile in enumerate(tiles):
+        r, c = divmod(i, cols)
+        x = pad + c * (cell_w + pad)
+        y = title_h + pad + r * (cell_h + pad)
+        fig[y:y + cell_h, x:x + cell_w] = tile
+    return fig
+
+
 # =================================================================== PROSES
 def process_sheet(path, key, ink_t, positions, args, truth):
     name = os.path.splitext(os.path.basename(path))[0]
@@ -222,14 +271,14 @@ def process_sheet(path, key, ink_t, positions, args, truth):
     answers, _ = read_answers(ink_s, ink_t, positions, args.min_extra, args.dominance)
     benar, salah, kosong, ganda, nilai = score(answers, key)
 
-    # gambar tiap langkah (bahan screenshot laporan)
+    # satu figure berisi semua langkah (bahan screenshot laporan)
     folder = os.path.join(args.out, name)
     os.makedirs(folder, exist_ok=True)
     steps["6_perspective_warp"] = warped
     steps["7_threshold"] = ink_s
     steps["8_hasil"] = annotate(warped, positions, answers, key, benar, salah, nilai)
-    for k, img in steps.items():
-        cv2.imwrite(os.path.join(folder, k + ".jpg"), img)
+    figure = make_steps_figure(steps, name)
+    cv2.imwrite(os.path.join(folder, "figure_tahapan.jpg"), figure)
 
     with open(os.path.join(folder, "detail.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -371,7 +420,7 @@ def main():
         jumlah = sum(N_SOAL for r in summary if r[6])
         if jumlah:
             print(f"Akurasi pembacaan jawaban: {total}/{jumlah} = {100.0 * total / jumlah:.2f}%")
-    print(f"Hasil tersimpan di folder '{args.out}/' (ringkasan.csv + gambar tiap lembar)")
+    print(f"Hasil tersimpan di folder '{args.out}/' (ringkasan.csv + figure tiap lembar)")
 
 
 if __name__ == "__main__":

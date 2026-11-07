@@ -71,9 +71,9 @@ Akurasi pembacaan = jumlah soal yang terbaca sama dengan truth / total soal.
 
 ## 6. Output (folder `hasil/`)
 - `ringkasan.csv` : benar, salah, kosong, ganda, nilai tiap lembar.
-- `hasil/<nama_lembar>/` berisi gambar tiap tahap (bahan screenshot laporan):
-  `1_original`, `2_grayscale`, `3_blur`, `4_canny`, `5_kontur_lembar`,
-  `6_perspective_warp`, `7_threshold`, `8_hasil` (kotak hijau = benar, merah = salah,
+- `hasil/<nama_lembar>/` berisi satu figure `figure_tahapan.jpg` (semua tahap dalam satu grid
+  berlabel: `1. Original`, `2. Grayscale`, `3. Gaussian Blur`, `4. Canny`, `5. Kontur Lembar`,
+  `6. Perspective Warp`, `7. Threshold`, `8. Hasil` — kotak hijau = benar, merah = salah,
   biru = posisi kunci), serta `detail.csv` (kunci vs jawaban tiap soal).
 
 Aturan nilai: jawaban sama dengan kunci -> `benar = benar + 1`, selain itu `salah = salah + 1`.
