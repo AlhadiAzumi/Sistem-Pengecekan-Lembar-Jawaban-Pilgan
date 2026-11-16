@@ -9,7 +9,7 @@ proyek_pilgan/
 ├── README.md
 └── dataset/
     ├── template_kosong.jpeg    <- gambar lembar KOSONG (acuan posisi huruf A-E)
-    ├── kunci_contoh.csv        <- contoh format kunci jawaban
+    ├── kunci.csv               <- contoh format kunci jawaban
     └── lembar/                 <- taruh foto lembar terisi di sini
 ```
 
@@ -24,13 +24,26 @@ pip install -r requirements.txt
 ```
 python main.py --demo
 ```
-Program membuat 5 foto lembar buatan (dengan perspektif, cahaya tidak rata, lingkaran/silang/arsir,
-soal kosong, soal ganda), memeriksanya, dan menampilkan nilai serta akurasi pembacaan.
-Hasil ada di `hasil/demo/`.
+Setelah itu terminal menanyakan instruksi tanda dengan menu angka:
+```
+1. Hanya silang (X)
+2. Hanya bulat / lingkari
+3. Hanya bulat hitam / arsir
+4. Boleh semua (campuran)   <- Enter = pilihan ini
+```
+Program membuat 5 foto lembar buatan dengan tanda **bervariasi** (campuran lingkaran, silang, bulat hitam,
+plus soal kosong, soal ganda, dan ganda yang salah satunya dicoret), memeriksanya, dan menampilkan nilai
+serta akurasi pembacaan. Hasil ada di `hasil/demo/`. Ingin melewati menu? Tambahkan langsung
+`--mode silang|bulat|bulat_hitam|semua`.
+
+Catatan: jika memilih mode spesifik (mis. `1` = hanya silang), sekitar 85% tanda pada lembar demo
+memakai gaya tersebut, sedangkan sisanya sengaja memakai gaya lain dan dihitung **salah** sebagai
+"tanda tidak sesuai instruksi" - ini untuk memperlihatkan penegakan aturan. File `truth.csv` demo
+sudah memperhitungkan aturan ini, jadi akurasi pembacaan seharusnya mendekati 100% bila pembacaan benar.
 
 ## 4. Menjalankan dengan Data Sendiri
 1. Taruh foto lembar terisi di `dataset/lembar/` (misal `lembar_01.jpg` ... `lembar_25.jpg`).
-2. Buat `dataset/kunci.csv` (salin dari `kunci_contoh.csv` lalu ubah isinya):
+2. Buat/ubah `dataset/kunci.csv` sesuai kunci jawaban:
    ```
    soal,jawaban
    1,A
@@ -42,14 +55,24 @@ Hasil ada di `hasil/demo/`.
    ```
    python main.py
    ```
+   Pilih instruksi tanda bila perlu:
+   ```
+   python main.py --mode silang        # hanya silang
+   python main.py --mode bulat         # hanya bulat/lingkar
+   python main.py --mode bulat_hitam   # hanya bulat hitam/arsir
+   python main.py --mode semua         # boleh semua (default)
+   ```
    Kalau gambar berupa hasil scan / sudah dipotong rapi (tidak ada latar meja):
    ```
    python main.py --scan
    ```
 
 ### Cara mengisi lembar
-Lingkari, silang, atau arsir HURUF jawaban (A-E) yang dipilih. Satu soal satu tanda.
-Soal tanpa tanda = kosong, soal dengan dua tanda kuat = ganda (keduanya dihitung salah).
+Tandai HURUF jawaban (A-E) sesuai instruksi (`--mode`: silang, bulat, bulat hitam, atau semua). Satu soal satu tanda.
+- Soal tanpa tanda = kosong.
+- Jika mode spesifik (mis. **hanya silang**), tanda yang **tidak sesuai instruksi** (mis. dilingkari) dianggap **tanda salah** dan dihitung salah.
+- Soal dengan dua/lebih tanda kuat = **ganda**: diberi keterangan ganda dan dianggap **belum menjawab** (dihitung salah, masuk kolom ganda).
+- Jika pada jawaban ganda salah satu tanda **dicoret** (garis `=`), coretan dianggap pembatal sehingga bukan ganda dan jawaban yang tersisa dibaca.
 
 ### Cara foto yang baik
 - Seluruh 4 sudut kertas masuk frame, kertas diletakkan di atas latar yang kontras (meja gelap).
@@ -68,20 +91,24 @@ Jalankan:
 python main.py --truth dataset/truth.csv
 ```
 Akurasi pembacaan = jumlah soal yang terbaca sama dengan truth / total soal.
+Untuk data demo, `truth.csv` dibuat otomatis sesuai mode: tanda yang gaya-nya tidak sesuai instruksi
+tertulis sebagai `-` (memang seharusnya dibaca kosong/tanda salah).
 
 ## 6. Output (folder `hasil/`)
-- `ringkasan.csv` : benar, salah, kosong, ganda, nilai tiap lembar.
+- `ringkasan.csv` : benar, salah, kosong, ganda, nilai tiap lembar (ganda = jawaban ganda valid, dianggap belum menjawab).
 - `hasil/<nama_lembar>/` berisi satu figure `figure_tahapan.jpg` (semua tahap dalam satu grid
   berlabel: `1. Original`, `2. Grayscale`, `3. Gaussian Blur`, `4. Canny`, `5. Kontur Lembar`,
   `6. Perspective Warp`, `7. Threshold`, `8. Hasil` — kotak hijau = benar, merah = salah,
-  biru = posisi kunci), serta `detail.csv` (kunci vs jawaban tiap soal).
+  biru = posisi kunci, label `GANDA`/`KOSONG`/`TANDA SALAH` di samping nomor soal, dan legenda warna
+  di bawah gambar), serta `detail.csv` (kunci, jawaban, status, keterangan tiap soal; status/keterangan menandai ganda atau ganda yang salah satunya dicoret).
 
-Aturan nilai: jawaban sama dengan kunci -> `benar = benar + 1`, selain itu `salah = salah + 1`.
+Aturan nilai: jawaban sama dengan kunci -> `benar = benar + 1`, selain itu `salah = salah + 1` (termasuk kosong dan ganda/belum menjawab).
 Nilai = benar / 50 x 100.
 
 ## 7. Parameter yang Bisa Diatur
 | Opsi | Fungsi | Kapan diubah |
 |---|---|---|
+| `--mode silang\|bulat\|bulat_hitam\|semua` | instruksi jenis tanda jawaban yang diterima (default: ditanya lewat menu saat `--demo`, selain itu `semua`) | Sesuaikan dengan aturan pengisian lembar |
 | `--min-extra 40` | minimal tinta tambahan agar huruf dianggap ditandai | Turunkan (30) jika tanda tipis/pensil tidak terbaca; naikkan (60) jika soal kosong terbaca terisi |
 | `--dominance 3.0` | rasio tanda terkuat vs kedua; di bawahnya dianggap ganda | Naikkan jika jawaban ganda tidak terdeteksi; turunkan jika bekas hapusan dianggap ganda |
 | `--scan` | lewati pencarian kertas | Gambar sudah scan / dipotong rapi |

@@ -1,51 +1,51 @@
-soal,kunci,jawaban,status
-1,C,C,benar
-2,B,B,benar
-3,D,B,salah
-4,A,A,benar
-5,A,C,salah
-6,E,C,salah
-7,A,A,benar
-8,C,C,benar
-9,E,E,benar
-10,A,A,benar
-11,E,E,benar
-12,B,B,benar
-13,A,A,benar
-14,A,A,benar
-15,D,E,salah
-16,D,D,benar
-17,A,A,benar
-18,B,B,benar
-19,A,A,benar
-20,E,E,benar
-21,D,D,benar
-22,A,C,salah
-23,E,E,benar
-24,A,A,benar
-25,B,B,benar
-26,E,E,benar
-27,A,A,benar
-28,E,E,benar
-29,E,E,benar
-30,D,B,salah
-31,A,*,salah
-32,B,B,benar
-33,A,A,benar
-34,E,E,benar
-35,B,B,benar
-36,C,A,salah
-37,D,D,benar
-38,B,A,salah
-39,E,-,salah
-40,A,A,benar
-41,E,C,salah
-42,C,C,benar
-43,E,E,benar
-44,B,E,salah
-45,A,A,benar
-46,E,D,salah
-47,E,E,benar
-48,B,B,benar
-49,C,C,benar
-50,A,A,benar
+soal,kunci,jawaban,status,keterangan
+1,C,C,benar,terbaca
+2,B,B,benar,terbaca
+3,D,D,benar,terbaca
+4,A,A,benar,terbaca
+5,A,A,benar,terbaca
+6,E,E,benar,terbaca
+7,A,A,benar,terbaca
+8,C,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
+9,E,E,benar,terbaca
+10,A,A,benar,terbaca
+11,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+12,B,B,benar,terbaca
+13,A,A,benar,terbaca
+14,A,A,benar,terbaca
+15,D,C,salah,terbaca
+16,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+17,A,B,salah,terbaca
+18,B,B,benar,terbaca
+19,A,A,benar,terbaca
+20,E,E,benar,terbaca
+21,D,D,benar,terbaca
+22,A,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
+23,E,E,benar,terbaca
+24,A,A,benar,terbaca
+25,B,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+26,E,E,benar,terbaca
+27,A,,ganda_belum_menjawab,"jawaban ganda, dianggap belum menjawab"
+28,E,E,benar,terbaca
+29,E,E,benar,terbaca
+30,D,C,salah,terbaca
+31,A,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
+32,B,B,benar,terbaca
+33,A,A,benar,terbaca
+34,E,,kosong,kosong
+35,B,B,benar,terbaca
+36,C,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
+37,D,D,benar,terbaca
+38,B,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+39,E,E,benar,terbaca
+40,A,A,benar,terbaca
+41,E,E,benar,terbaca
+42,C,C,benar,terbaca
+43,E,E,benar,terbaca
+44,B,B,benar,terbaca
+45,A,A,benar,terbaca
+46,E,E,benar,terbaca
+47,E,E,benar,terbaca
+48,B,B,benar,terbaca
+49,C,C,benar,terbaca
+50,A,A,benar,terbaca
