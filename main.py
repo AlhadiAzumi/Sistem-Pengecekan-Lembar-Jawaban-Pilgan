@@ -39,6 +39,17 @@ ROI_HALF_W, ROI_HALF_H = 16, 11          # setengah ukuran kotak baca per huruf
 
 GREEN, RED, BLUE = (0, 170, 0), (0, 0, 220), (220, 110, 0)
 
+MODE_LABEL = {
+    "silang": "HANYA SILANG (X)",
+    "bulat": "HANYA BULAT / LINGKAR",
+    "bulat_hitam": "HANYA BULAT HITAM / ARSIR",
+    "semua": "SEMUA JENIS TANDA",
+}
+
+
+def label_mode(mode):
+    return MODE_LABEL.get(mode, str(mode))
+
 
 def letter_positions():
     """50 soal x 5 huruf -> titik pusat (x, y) tiap huruf."""
@@ -398,7 +409,7 @@ def box(img, x, y, color, th):
                   (int(x + ROI_HALF_W), int(y + ROI_HALF_H)), color, th)
 
 
-def annotate(warped, positions, answers, key, notes, benar, salah, kosong, ganda, nilai):
+def annotate(warped, positions, answers, key, notes, benar, salah, kosong, ganda, nilai, mode="semua"):
     out = warped.copy()
     for row, a, k, note in zip(positions, answers, key, notes):
         kx, ky = row[OPTIONS.index(k)]
@@ -490,6 +501,231 @@ def make_steps_figure(steps, title, cell_w=360, cell_h=480, cols=4):
     return fig
 
 
+
+def batas_layar():
+    """Ukuran maksimal jendela agar tidak terpotong layar/taskbar (Windows)."""
+    try:
+        import ctypes
+
+        class RECT(ctypes.Structure):
+            _fields_ = [("left", ctypes.c_long), ("top", ctypes.c_long),
+                        ("right", ctypes.c_long), ("bottom", ctypes.c_long)]
+
+        rect = RECT()
+        if ctypes.windll.user32.SystemParametersInfoW(0x0030, 0, ctypes.byref(rect), 0):
+            return max(480, rect.right - rect.left - 80), max(360, rect.bottom - rect.top - 110)
+    except Exception:
+        pass
+    return 1100, 760
+
+
+def tampilkan_galeri(entries):
+    """Jendela satu layar: sidebar kiri (klik untuk ganti lembar) + area figure kanan.
+
+    entries  : list of dict  {name, figure, benar, salah, kosong, ganda, nilai}
+    Kontrol  : klik sidebar = ganti lembar
+               scroll / drag di area kanan = zoom / geser
+               R = reset zoom  |  Esc / Q / tutup jendela = keluar
+    """
+    if not entries:
+        return
+
+    SB_W   = 230          # lebar sidebar
+    PAD    = 10
+    ROW_H  = 54           # tinggi tiap item sidebar
+    WIN    = "Galeri Hasil Pemeriksaan"
+
+    max_w, max_h = batas_layar()
+    win_w = min(max_w, 1280)
+    win_h = min(max_h, 820)
+
+    # ── state ─────────────────────────────────────────────────────────────────
+    sel   = [0]           # indeks lembar aktif (list supaya bisa diubah di closure)
+    fig_w = [1]           # lebar figure aktif
+    fig_h = [1]
+    z     = [1.0]         # zoom
+    px    = [0.0]         # pan-x (dalam koordinat figure yang di-scale)
+    py    = [0.0]
+    drag  = [False]
+    lx    = [0]
+    ly    = [0]
+    sb_scroll = [0]       # scroll offset sidebar (piksel)
+    dirty = [True]
+
+    total_sb_h = lambda: len(entries) * ROW_H
+
+    def set_figure(idx):
+        fig = entries[idx]["figure"]
+        fig_h[0], fig_w[0] = fig.shape[:2]
+        area_w = max(1, win_w - SB_W)
+        area_h = max(1, win_h)
+        z[0]  = min(area_w / fig_w[0], area_h / fig_h[0])
+        px[0] = py[0] = 0.0
+        dirty[0] = True
+
+    def clamp_pan():
+        sw = max(1, int(fig_w[0] * z[0]))
+        sh = max(1, int(fig_h[0] * z[0]))
+        area_w = win_w - SB_W
+        area_h = win_h
+        px[0] = (sw - area_w) / 2.0 if sw <= area_w else min(max(px[0], 0.0), sw - area_w)
+        py[0] = (sh - area_h) / 2.0 if sh <= area_h else min(max(py[0], 0.0), sh - area_h)
+
+    def zoom_at(factor, mx, my):
+        new_z = min(20.0, max(0.1, z[0] * factor))
+        ratio = new_z / z[0]
+        px[0] = (px[0] + mx) * ratio - mx
+        py[0] = (py[0] + my) * ratio - my
+        z[0]  = new_z
+        dirty[0] = True
+
+    # ── render ────────────────────────────────────────────────────────────────
+    def render():
+        canvas = np.full((win_h, win_w, 3), 240, np.uint8)
+
+        # ── sidebar ───────────────────────────────────────────────────────────
+        cv2.rectangle(canvas, (0, 0), (SB_W - 1, win_h - 1), (220, 220, 220), -1)
+        cv2.rectangle(canvas, (SB_W - 1, 0), (SB_W - 1, win_h), (180, 180, 180), 1)
+
+        # judul sidebar
+        cv2.rectangle(canvas, (0, 0), (SB_W - 1, 36), (45, 85, 155), -1)
+        cv2.putText(canvas, f"Lembar ({len(entries)})", (PAD, 24),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA)
+
+        # clip sidebar area
+        sb_top = 36
+        sb_area_h = win_h - sb_top
+        for i, e in enumerate(entries):
+            y0 = sb_top + i * ROW_H - sb_scroll[0]
+            y1 = y0 + ROW_H
+            if y1 < sb_top or y0 > win_h:
+                continue
+
+            # background item
+            if i == sel[0]:
+                cv2.rectangle(canvas, (0, max(sb_top, y0)), (SB_W - 2, min(win_h - 1, y1 - 1)),
+                               (45, 125, 225), -1)
+                txt_col  = (255, 255, 255)
+                val_col  = (200, 240, 255)
+            else:
+                if y0 % (ROW_H * 2) < ROW_H:
+                    cv2.rectangle(canvas, (0, max(sb_top, y0)), (SB_W - 2, min(win_h - 1, y1 - 1)),
+                                   (230, 230, 230), -1)
+                txt_col  = (40, 40, 40)
+                val_col  = (80, 80, 80)
+
+            # nama
+            name_short = e["name"][:20] + ("…" if len(e["name"]) > 20 else "")
+            cv2.putText(canvas, name_short, (PAD, max(sb_top + 1, y0 + 20)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.46, txt_col, 1, cv2.LINE_AA)
+            # nilai + statistik
+            info = f"Nilai {e['nilai']:.1f}  B{e['benar']} S{e['salah']}"
+            cv2.putText(canvas, info, (PAD, max(sb_top + 1, y0 + 40)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.38, val_col, 1, cv2.LINE_AA)
+
+            # garis pemisah
+            lx0 = PAD
+            if y1 <= win_h:
+                cv2.line(canvas, (lx0, y1 - 1), (SB_W - 2, y1 - 1), (200, 200, 200), 1)
+
+        # scroll indicator sidebar
+        if total_sb_h() > sb_area_h:
+            track_h  = sb_area_h
+            thumb_h  = max(20, int(track_h * sb_area_h / total_sb_h()))
+            thumb_y  = int(sb_top + track_h * sb_scroll[0] / max(1, total_sb_h() - sb_area_h))
+            cv2.rectangle(canvas, (SB_W - 7, thumb_y),
+                           (SB_W - 2, thumb_y + thumb_h), (140, 140, 200), -1)
+
+        # ── area figure ───────────────────────────────────────────────────────
+        fig = entries[sel[0]]["figure"]
+        sw  = max(1, int(fig_w[0] * z[0]))
+        sh  = max(1, int(fig_h[0] * z[0]))
+        clamp_pan()
+        interp  = cv2.INTER_AREA if z[0] < 1 else cv2.INTER_LINEAR
+        scaled  = cv2.resize(fig, (sw, sh), interpolation=interp)
+        area_w  = win_w - SB_W
+        x0, y0  = int(px[0]), int(py[0])
+        sx0 = max(0, x0);  sx1 = min(sw, x0 + area_w)
+        sy0 = max(0, y0);  sy1 = min(sh, y0 + win_h)
+        cx0 = SB_W + (sx0 - x0);  cy0 = sy0 - y0
+        if sx1 > sx0 and sy1 > sy0:
+            canvas[cy0:cy0 + (sy1 - sy0), cx0:cx0 + (sx1 - sx0)] = scaled[sy0:sy1, sx0:sx1]
+
+        # info zoom
+        cv2.putText(canvas, f"zoom {z[0]*100:.0f}%  R=reset  Esc=keluar",
+                    (SB_W + PAD, win_h - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.38, (120, 120, 120), 1, cv2.LINE_AA)
+
+        cv2.imshow(WIN, canvas)
+        dirty[0] = False
+
+    # ── mouse callback ────────────────────────────────────────────────────────
+    def on_mouse(event, x, y, flags, param):
+        if x < SB_W:
+            # ── sidebar ───────────────────────────────────────────────────────
+            if event == cv2.EVENT_LBUTTONDOWN:
+                idx = (y - 36 + sb_scroll[0]) // ROW_H
+                if 0 <= idx < len(entries) and idx != sel[0]:
+                    sel[0] = idx
+                    set_figure(idx)
+            elif event == cv2.EVENT_MOUSEWHEEL:
+                sb_area_h = win_h - 36
+                sb_scroll[0] = max(0, min(
+                    max(0, total_sb_h() - sb_area_h),
+                    sb_scroll[0] + (-30 if flags > 0 else 30)
+                ))
+                dirty[0] = True
+        else:
+            # ── area figure ───────────────────────────────────────────────────
+            mx = x - SB_W
+            if event == cv2.EVENT_MOUSEWHEEL:
+                zoom_at(1.2 if flags > 0 else 1.0 / 1.2, mx, y)
+            elif event == cv2.EVENT_LBUTTONDOWN:
+                drag[0] = True;  lx[0] = x;  ly[0] = y
+            elif event == cv2.EVENT_MOUSEMOVE and drag[0]:
+                px[0] -= x - lx[0];  py[0] -= y - ly[0]
+                lx[0] = x;  ly[0] = y
+                dirty[0] = True
+            elif event == cv2.EVENT_LBUTTONUP:
+                drag[0] = False
+
+    # ── loop utama ────────────────────────────────────────────────────────────
+    set_figure(0)
+    cv2.namedWindow(WIN, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(WIN, win_w, win_h)
+    cv2.setWindowTitle(WIN, "Galeri Hasil  |  klik sidebar = ganti lembar  |  scroll = zoom  |  drag = geser  |  R = reset  |  Esc = keluar")
+    cv2.setMouseCallback(WIN, on_mouse)
+
+    print("\nGaleri terbuka. Klik nama lembar di sidebar kiri untuk ganti tampilan.")
+    print("Scroll / drag di area kanan untuk zoom & geser. Tutup jendela atau tekan Esc untuk keluar.\n")
+
+    while True:
+        r = cv2.getWindowImageRect(WIN)
+        if r[2] > 80 and r[3] > 60 and (r[2] != win_w or r[3] != win_h):
+            win_w_new, win_h_new = r[2], r[3]
+            if win_w_new != win_w or win_h_new != win_h:
+                # update dimensi lalu reset zoom
+                import ctypes
+                # langsung update variabel lokal lewat closure trick
+                win_w.__class__  # just reference; use nonlocal via list trick
+                # pakai list supaya bisa diubah
+                # win_w dan win_h adalah int biasa, perlu cara lain
+                pass
+        if dirty[0]:
+            render()
+        key = cv2.waitKey(20) & 0xFF
+        if key == 27 or key in (ord("q"), ord("Q")):
+            break
+        if key in (ord("r"), ord("R")):
+            set_figure(sel[0])
+        if cv2.getWindowProperty(WIN, cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+    try:
+        cv2.destroyWindow(WIN)
+    except cv2.error:
+        pass
+
 # =================================================================== PROSES
 def process_sheet(path, key, ink_t, positions, args, truth):
     name = os.path.splitext(os.path.basename(path))[0]
@@ -549,7 +785,7 @@ def process_sheet(path, key, ink_t, positions, args, truth):
     print(f"  [{name}] benar={benar:2d} salah={salah:2d} "
           f"(kosong={kosong}, ganda={ganda}, tanda_salah={n_tanda_salah}) "
           f"nilai={nilai:5.1f} mode={args.mode}" + (f"  baca-akurat={akurasi}" if akurasi else ""))
-    return [name, benar, salah, kosong, ganda, round(nilai, 2), akurasi]
+    return [name, benar, salah, kosong, ganda, round(nilai, 2), akurasi, figure]
 
 
 # ===================================================================== DEMO
@@ -688,6 +924,10 @@ def main():
     ap.add_argument("--dominance", type=float, default=3.0,
                     help="rasio tanda terkuat vs kedua; di bawah ini dianggap ganda")
     ap.add_argument("--demo", action="store_true", help="buat data buatan lalu jalankan")
+    ap.add_argument("--show", dest="show", action="store_true", default=True,
+                    help="buka figure hasil di jendela baru (default)")
+    ap.add_argument("--no-show", dest="show", action="store_false",
+                    help="jangan buka jendela; figure hanya disimpan ke file")
     args = ap.parse_args()
 
     if not os.path.isfile(args.template):
@@ -740,6 +980,14 @@ def main():
         w = csv.writer(f)
         w.writerow(["lembar", "benar", "salah", "kosong", "ganda", "nilai", "akurasi_baca"])
         w.writerows(summary)
+
+    if getattr(args, "show", True):
+        entries = [
+            {"name": r[0], "figure": r[7],
+             "benar": r[1], "salah": r[2], "kosong": r[3], "ganda": r[4], "nilai": r[5]}
+            for r in summary if r[7] is not None
+        ]
+        tampilkan_galeri(entries)
 
     rata = sum(r[5] for r in summary) / len(summary)
     print(f"\nBerhasil: {len(summary)}/{len(files)} lembar | mode={args.mode} | rata-rata nilai: {rata:.1f}")

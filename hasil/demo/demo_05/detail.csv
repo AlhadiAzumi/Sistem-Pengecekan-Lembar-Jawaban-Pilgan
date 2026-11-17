@@ -19,7 +19,7 @@ soal,kunci,jawaban,status,keterangan
 18,B,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
 19,A,A,benar,terbaca
 20,E,E,benar,terbaca
-21,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+21,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 22,A,A,benar,terbaca
 23,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
 24,A,,ganda_belum_menjawab,"jawaban ganda, dianggap belum menjawab"
@@ -37,10 +37,10 @@ soal,kunci,jawaban,status,keterangan
 36,C,C,benar,terbaca
 37,D,D,benar,terbaca
 38,B,B,benar,terbaca
-39,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+39,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 40,A,A,benar,terbaca
 41,E,E,benar,terbaca
-42,C,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+42,C,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 43,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
 44,B,B,benar,terbaca
 45,A,A,benar,terbaca

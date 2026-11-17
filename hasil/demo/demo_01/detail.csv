@@ -2,9 +2,9 @@ soal,kunci,jawaban,status,keterangan
 1,C,C,benar,terbaca
 2,B,B,benar,terbaca
 3,D,D,benar,terbaca
-4,A,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+4,A,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 5,A,,kosong,kosong
-6,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+6,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 7,A,A,benar,terbaca
 8,C,C,benar,terbaca
 9,E,E,benar,terbaca
@@ -14,7 +14,7 @@ soal,kunci,jawaban,status,keterangan
 13,A,A,benar,terbaca
 14,A,A,benar,terbaca
 15,D,D,benar,terbaca
-16,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+16,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 17,A,A,benar,terbaca
 18,B,B,benar,terbaca
 19,A,A,benar,terbaca
@@ -32,7 +32,7 @@ soal,kunci,jawaban,status,keterangan
 31,A,A,benar,terbaca
 32,B,B,benar,terbaca
 33,A,A,benar,terbaca
-34,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+34,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 35,B,B,benar,terbaca
 36,C,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat)
 37,D,,ganda_belum_menjawab,"jawaban ganda, dianggap belum menjawab"

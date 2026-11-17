@@ -1,7 +1,7 @@
 soal,kunci,jawaban,status,keterangan
 1,C,C,benar,terbaca
 2,B,B,benar,terbaca
-3,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+3,D,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 4,A,A,benar,terbaca
 5,A,A,benar,terbaca
 6,E,E,benar,terbaca
@@ -18,7 +18,7 @@ soal,kunci,jawaban,status,keterangan
 17,A,A,benar,terbaca
 18,B,B,benar,terbaca
 19,A,B,salah,terbaca
-20,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+20,E,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 21,D,D,benar,terbaca
 22,A,A,benar,terbaca
 23,E,D,salah,terbaca
@@ -42,7 +42,7 @@ soal,kunci,jawaban,status,keterangan
 41,E,E,benar,terbaca
 42,C,C,benar,terbaca
 43,E,C,salah,terbaca
-44,B,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: silang)
+44,B,,tanda_tidak_sesuai,tanda tidak sesuai instruksi (terdeteksi: bulat_hitam)
 45,A,A,benar,terbaca
 46,E,E,benar,terbaca
 47,E,E,benar,terbaca

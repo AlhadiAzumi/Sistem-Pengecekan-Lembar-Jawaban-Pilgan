@@ -33,8 +33,11 @@ Setelah itu terminal menanyakan instruksi tanda dengan menu angka:
 ```
 Program membuat 5 foto lembar buatan dengan tanda **bervariasi** (campuran lingkaran, silang, bulat hitam,
 plus soal kosong, soal ganda, dan ganda yang salah satunya dicoret), memeriksanya, dan menampilkan nilai
-serta akurasi pembacaan. Hasil ada di `hasil/demo/`. Ingin melewati menu? Tambahkan langsung
-`--mode silang|bulat|bulat_hitam|semua`.
+serta akurasi pembacaan. Hasil ada di `hasil/demo/`. Setelah tiap lembar diproses, figure hasil
+otomatis terbuka di **jendela baru**: **scroll = zoom**, **drag = geser**, `R` = reset,
+`F` = ganti tampilan penuh/seluruh (default: seluruh gambar terlihat, termasuk saat maximize),
+`Enter`/`Spasi` = lanjut ke lembar berikutnya, `Esc` = lewati jendela berikutnya.
+Ingin melewati menu? Tambahkan langsung `--mode silang|bulat|bulat_hitam|semua`.
 
 Catatan: jika memilih mode spesifik (mis. `1` = hanya silang), sekitar 85% tanda pada lembar demo
 memakai gaya tersebut, sedangkan sisanya sengaja memakai gaya lain dan dihitung **salah** sebagai
@@ -65,6 +68,14 @@ sudah memperhitungkan aturan ini, jadi akurasi pembacaan seharusnya mendekati 10
    Kalau gambar berupa hasil scan / sudah dipotong rapi (tidak ada latar meja):
    ```
    python main.py --scan
+   ```
+   Secara default figure hasil terbuka di jendela baru (scroll = zoom, drag = geser,
+   `R` = reset, `F` = penuh/seluruh, `Enter`/`Spasi` = lanjut, `Esc` = lewati jendela berikutnya).
+   Saat di-maximize, seluruh gambar tetap terlihat (tidak terpotong); tekan `F` untuk mode penuh
+   yang memenuhi jendela (tepi gambar bisa terpotong, geser dengan drag).
+   Untuk batch banyak lembar tanpa jendela, tambahkan `--no-show`:
+   ```
+   python main.py --no-show
    ```
 
 ### Cara mengisi lembar
@@ -112,6 +123,7 @@ Nilai = benar / 50 x 100.
 | `--min-extra 40` | minimal tinta tambahan agar huruf dianggap ditandai | Turunkan (30) jika tanda tipis/pensil tidak terbaca; naikkan (60) jika soal kosong terbaca terisi |
 | `--dominance 3.0` | rasio tanda terkuat vs kedua; di bawahnya dianggap ganda | Naikkan jika jawaban ganda tidak terdeteksi; turunkan jika bekas hapusan dianggap ganda |
 | `--scan` | lewati pencarian kertas | Gambar sudah scan / dipotong rapi |
+| `--show` / `--no-show` | tampilkan figure hasil di jendela baru dengan scroll-zoom, drag, dan tampilan menyesuaikan ukuran jendela (default: `--show`) | Pakai `--no-show` untuk batch otomatis tanpa interaksi |
 | `--template`, `--key`, `--out` | ganti path file/folder | Kalau lokasi file berbeda |
 
 ## 8. Masalah Umum
