@@ -89,6 +89,7 @@ Tandai HURUF jawaban (A-E) sesuai instruksi (`--mode`: silang, bulat, bulat hita
 - Seluruh 4 sudut kertas masuk frame, kertas diletakkan di atas latar yang kontras (meja gelap).
 - Pencahayaan cukup, tidak ada bayangan tangan/HP yang menutupi lembar.
 - Boleh agak miring, program meluruskan otomatis.
+- Pastikan lembar tidak kusut.
 
 ## 5. Mengukur Akurasi (opsional, untuk bab pengujian)
 Buat `dataset/truth.csv` berisi jawaban asli yang ditandai tiap lembar (dicatat manual).
