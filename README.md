@@ -29,7 +29,7 @@ Setelah itu terminal menanyakan instruksi tanda dengan menu angka:
 1. Hanya silang (X)
 2. Hanya bulat / lingkari
 3. Hanya bulat hitam / arsir
-4. Boleh semua (campuran)   <- Enter = pilihan ini
+4. Boleh semua (campuran)   <- Enter = pilihan disamping
 ```
 Program membuat 5 foto lembar buatan dengan tanda **bervariasi** (campuran lingkaran, silang, bulat hitam,
 plus soal kosong, soal ganda, dan ganda yang salah satunya dicoret), memeriksanya, dan menampilkan nilai
