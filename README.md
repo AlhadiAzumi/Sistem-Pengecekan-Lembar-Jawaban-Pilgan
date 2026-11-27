@@ -90,6 +90,7 @@ Tandai HURUF jawaban (A-E) sesuai instruksi (`--mode`: silang, bulat, bulat hita
 - Pencahayaan cukup, tidak ada bayangan tangan/HP yang menutupi lembar.
 - Boleh agak miring, program meluruskan otomatis.
 - Pastikan lembar tidak kusut.
+- Kertas harus berada di tempat yang datar.
 
 ## 5. Mengukur Akurasi (opsional, untuk bab pengujian)
 Buat `dataset/truth.csv` berisi jawaban asli yang ditandai tiap lembar (dicatat manual).
